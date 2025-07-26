@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type ServeStat = {
   count: number;
@@ -73,6 +73,17 @@ const initialPlayers: PlayerRow[] = ["1", "2", "3", "4", "5", "6", "L"].map(
 
 export default function InputPage() {
   const [players, setPlayers] = useState<PlayerRow[]>(initialPlayers);
+  const [today,setToday] = useState("");
+  useEffect(()=>{
+    const now = new Date();
+    const formatted =
+      now.getFullYear() +
+      "/" +
+      String(now.getMonth() + 1).padStart(2, "0") +
+      "/" +
+      String(now.getDate()).padStart(2, "0");
+    setToday(formatted);
+  },[])
 
   const totalReception = players.reduce((recepSum, p) => {
     return (
@@ -91,39 +102,60 @@ export default function InputPage() {
       : Math.round((individual / totalReception) * 1000) / 10;
   };
 
-  const totalSpike = players.reduce((recepSum, p) => {
+  const totalSpike = players.reduce((spikeSum, p) => {
     return (
-      recepSum + p.stats.spike.count + p.stats.spike.point + p.stats.spike.miss
+      spikeSum + p.stats.spike.count
     );
   }, 0);
 
   const getSpikePercentage = (p: PlayerRow): number => {
     const individual =
-      p.stats.reception.A + p.stats.reception.BC + p.stats.reception.miss;
-    return totalReception === 0
+      p.stats.spike.count;
+    return totalSpike === 0
       ? 0
-      : Math.round((individual / totalReception) * 1000) / 10;
+      : Math.round((individual / totalSpike) * 1000) / 10;
   };
 
+  const getPlus = (p: PlayerRow): number => {
+    return (
+      p.stats.serve.point +
+      p.stats.spike.point +
+      p.stats.block.point +
+      p.stats.other.point
+    );
+  };
+
+  const getMinus = (p: PlayerRow): number => {
+    return (
+      p.stats.serve.miss +
+      p.stats.spike.miss +
+      p.stats.other.miss
+    );
+  };
+
+  const getNet = (p: PlayerRow): number => {
+    return getPlus(p) - getMinus(p);
+  };
+  
   return (
     <main className="text-black">
-      <h3>Date:{Date()}</h3>
-      <label htmlFor="tournament-type">大会の種類：</label>
+      <h3>Date: {today}</h3>
+      <label>大会の種類：</label>
       <select id="tournament-type" name="tournamentType">
-        <option value="">選択してください</option>
+        <option value="">-</option>
         <option value="official">公式</option>
         <option value="practice">練習</option>
       </select>
-      <label htmlFor="tournament-name">大会名:</label>
+      <label>大会名:</label>
       <input type="text" id="tournament-name" name="tournamentName" />
 
-      <label htmlFor="venue">会場名:</label>
+      <label>会場名:</label>
       <input type="text" id="venue" name="venue" />
 
-      <label htmlFor="opponent">対戦相手:</label>
+      <label>対戦相手:</label>
       <input type="text" id="opponent" name="opponent" />
 
-      <label htmlFor="recorded_by">記入者:</label>
+      <label>記入者:</label>
       <input type="text" id="recorded_by" name="recorded_by" />
       <br />
       <br />
@@ -145,11 +177,11 @@ export default function InputPage() {
             <th>A</th>
             <th>BC</th>
             <th>ミスP</th>
-            <th>%</th>
+            <th>全体%</th>
             <th>回</th>
             <th>P</th>
             <th>ミス</th>
-            <th>%</th>
+            <th>ミス%</th>
             <th>回</th>
             <th>P</th>
             <th>回</th>
@@ -160,7 +192,7 @@ export default function InputPage() {
             <th>P</th>
             <th>ミス</th>
             <th>＋</th>
-            <th>−</th>
+            <th>ー</th>
             <th>±</th>
           </tr>
         </thead>
@@ -171,7 +203,7 @@ export default function InputPage() {
               <td>{p.order}</td>
 
               {/* ポジ */}
-              <td className="border border-gray-400">
+              <td className="border">
                 <select
                   value={p.position}
                   onChange={(e) => {
@@ -191,7 +223,7 @@ export default function InputPage() {
               </td>
 
               {/* 名前 */}
-              <td className="border border-gray-400">
+              <td className="border">
                 <input
                   value={p.name}
                   onChange={(e) => {
@@ -203,7 +235,7 @@ export default function InputPage() {
               </td>
 
               {/* レセプション */}
-              <td className="border border-gray-400">
+              <td className="border">
                 <input
                   type="number"
                   value={p.stats.reception.A}
@@ -214,7 +246,7 @@ export default function InputPage() {
                   }}
                 />
               </td>
-              <td className="border border-gray-400">
+              <td className="border">
                 <input
                   type="number"
                   value={p.stats.reception.BC}
@@ -225,7 +257,7 @@ export default function InputPage() {
                   }}
                 />
               </td>
-              <td className="border border-gray-400">
+              <td className="border">
                 <input
                   type="number"
                   value={p.stats.reception.miss}
@@ -239,7 +271,22 @@ export default function InputPage() {
               <td className="border">{getReceptionPercentage(p)}%</td>
 
               {/* サーブ */}
-              <td className="border border-gray-400">
+              <td className="border ">
+                <input
+                  type="number"
+                  value={p.stats.serve.count}
+                  onChange={(e) => {
+                    const copy = [...players];
+                    const newCount = +e.target.value;
+                    const miss = copy[i].stats.serve.miss;
+                    copy[i].stats.serve.count = newCount;
+                    copy[i].stats.serve.missPercentage =
+                      newCount === 0 ? 0 : Math.round((miss / newCount) * 1000) / 10;
+                    setPlayers(copy);
+                  }}
+                />
+              </td>
+              <td className="border">
                 <input
                   type="number"
                   value={p.stats.serve.point}
@@ -250,20 +297,37 @@ export default function InputPage() {
                   }}
                 />
               </td>
-              <td className="border border-gray-400">
+              <td className="border">
                 <input
                   type="number"
                   value={p.stats.serve.miss}
                   onChange={(e) => {
                     const copy = [...players];
-                    copy[i].stats.serve.miss = +e.target.value;
+                    const newMiss = +e.target.value;
+                    const count = copy[i].stats.serve.count;
+                    copy[i].stats.serve.miss = newMiss;
+                    copy[i].stats.serve.missPercentage =
+                      count === 0 ? 0 : Math.round((newMiss / count) * 1000) / 10;
                     setPlayers(copy);
                   }}
                 />
               </td>
 
+              <td className="border">{p.stats.serve.missPercentage}%</td>
+
               {/* ブロック */}
-              <td className="border border-gray-400">
+              <td className="border">
+                <input
+                  type="number"
+                  value={p.stats.block.count}
+                  onChange={(e) => {
+                    const copy = [...players];
+                    copy[i].stats.block.point = +e.target.value;
+                    setPlayers(copy);
+                  }}
+                />
+              </td>
+              <td className="border">
                 <input
                   type="number"
                   value={p.stats.block.point}
@@ -276,18 +340,39 @@ export default function InputPage() {
               </td>
 
               {/* スパイク */}
-              <td className="border border-gray-400">
+              <td className="border">
+                <input
+                  type="number"
+                  value={p.stats.spike.count}
+                  onChange={(e) => {
+                    const copy = [...players];
+                    const newCount = +e.target.value;
+                    const point = copy[i].stats.spike.point;
+                    copy[i].stats.spike.count = newCount;
+                    copy[i].stats.spike.pointPercentage =
+                      newCount === 0 ? 0 : Math.round((point / newCount) * 1000) / 10;
+                    setPlayers(copy);
+                  }}
+                />
+              </td>
+
+              <td className="border">
                 <input
                   type="number"
                   value={p.stats.spike.point}
                   onChange={(e) => {
                     const copy = [...players];
-                    copy[i].stats.spike.point = +e.target.value;
+                    const newPoint = +e.target.value;
+                    const count = copy[i].stats.spike.count;
+                    copy[i].stats.spike.point = newPoint;
+                    copy[i].stats.spike.pointPercentage =
+                      count === 0 ? 0 : Math.round((newPoint / count) * 1000) / 10;
                     setPlayers(copy);
                   }}
                 />
+
               </td>
-              <td className="border border-gray-400">
+              <td className="border">
                 <input
                   type="number"
                   value={p.stats.spike.miss}
@@ -298,10 +383,11 @@ export default function InputPage() {
                   }}
                 />
               </td>
+              <td className="border">{p.stats.spike.pointPercentage}%</td>
               <td className="border">{getSpikePercentage(p)}%</td>
 
               {/* その他 */}
-              <td className="border border-gray-400">
+              <td className="border">
                 <input
                   type="number"
                   value={p.stats.other.point}
@@ -312,7 +398,7 @@ export default function InputPage() {
                   }}
                 />
               </td>
-              <td className="border border-gray-400">
+              <td className="border">
                 <input
                   type="number"
                   value={p.stats.other.miss}
@@ -323,10 +409,19 @@ export default function InputPage() {
                   }}
                 />
               </td>
+
+              {/* TOTAL */}
+              <td className="border">{getPlus(p)}</td>
+              <td className="border">{getMinus(p)}</td>
+              <td className="border">{getNet(p)}</td>
             </tr>
           ))}
         </tbody>
       </table>
+      <br />
+      <br />
+      <br />
+      <button className="border">保存</button>
     </main>
   );
 }
