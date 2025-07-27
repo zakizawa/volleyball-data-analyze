@@ -196,6 +196,8 @@ export default function InputPage() {
     }
   };
 
+  const borderClass = "border border-[5px] border-[#EDF7FF]";
+
   return (
     <main className="text-black">
       <h3>Date: {today}</h3>
@@ -250,50 +252,79 @@ export default function InputPage() {
       <br />
       <br />
       <br />
-      <table className="table-fixed w-full border border-black border-collapse">
+      <table className="table-fixed w-full font-bold text-sm border-collapse">
+        <colgroup>
+          <col className="w-6" />
+          <col className="w-12" />
+          <col className="w-24" />
+          <col className="w-12" span={4} />
+          <col className="w-12" span={4} />
+          <col className="w-12" span={2} />
+          <col className="w-12" span={5} />
+          <col className="w-12" span={2} />
+          <col className="w-12" span={3} />
+        </colgroup>
         <thead>
-          <tr className="border border-black">
-            <th rowSpan={2}>順</th>
-            <th rowSpan={2}>ポジ</th>
-            <th rowSpan={2}>名前</th>
-            <th colSpan={4}>レセプション</th>
-            <th colSpan={4}>サーブ</th>
-            <th colSpan={2}>ブロック</th>
-            <th colSpan={5}>スパイク</th>
-            <th colSpan={2}>その他</th>
-            <th colSpan={3}>TOTAL</th>
+          <tr className="bg-[#6D28D9] text-white">
+            <th className={borderClass} rowSpan={2}>
+              順
+            </th>
+            <th className={borderClass} rowSpan={2}>
+              ポジ
+            </th>
+            <th className={borderClass} rowSpan={2}>
+              名前
+            </th>
+            <th className={borderClass} colSpan={4}>
+              レセプション
+            </th>
+            <th className={borderClass} colSpan={4}>
+              サーブ
+            </th>
+            <th className={borderClass} colSpan={2}>
+              ブロック
+            </th>
+            <th className={borderClass} colSpan={5}>
+              スパイク
+            </th>
+            <th className={borderClass} colSpan={2}>
+              その他
+            </th>
+            <th className={borderClass} colSpan={3}>
+              TOTAL
+            </th>
           </tr>
-          <tr>
-            <th>A</th>
-            <th>BC</th>
-            <th>ミスP</th>
-            <th>全体%</th>
-            <th>回</th>
-            <th>P</th>
-            <th>ミス</th>
-            <th>ミス%</th>
-            <th>回</th>
-            <th>P</th>
-            <th>回</th>
-            <th>P</th>
-            <th>ミス</th>
-            <th>決定率</th>
-            <th>全体%</th>
-            <th>P</th>
-            <th>ミス</th>
-            <th>＋</th>
-            <th>ー</th>
-            <th>±</th>
+          <tr className="bg-[#D9D9D9] text-[#6D28D9]">
+            <th className={borderClass}>A</th>
+            <th className={borderClass}>BC</th>
+            <th className={borderClass}>ミスP</th>
+            <th className={borderClass}>全体%</th>
+            <th className={borderClass}>回</th>
+            <th className={borderClass}>P</th>
+            <th className={borderClass}>ミス</th>
+            <th className={borderClass}>ミス%</th>
+            <th className={borderClass}>回</th>
+            <th className={borderClass}>P</th>
+            <th className={borderClass}>回</th>
+            <th className={borderClass}>P</th>
+            <th className={borderClass}>ミス</th>
+            <th className={borderClass}>決定率</th>
+            <th className={borderClass}>全体%</th>
+            <th className={borderClass}>P</th>
+            <th className={borderClass}>ミス</th>
+            <th className={borderClass}>＋</th>
+            <th className={borderClass}>ー</th>
+            <th className={borderClass}>±</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className=" bg-[#D9D9D9] text-sm text-center">
           {players.map((p, i) => (
             <tr key={i}>
               {/* 順 */}
-              <td>{p.order}</td>
+              <td className={`w-6 h-20 ${borderClass}`}>{p.order}</td>
 
               {/* ポジ */}
-              <td className="border">
+              <td className={borderClass}>
                 <select
                   value={p.position}
                   onChange={(e) => {
@@ -301,6 +332,7 @@ export default function InputPage() {
                     copy[i].position = e.target.value;
                     setPlayers(copy);
                   }}
+                  className="w-13 h-13 px-1 py-0.5 text-center"
                 >
                   <option value="">-</option>
                   <option value="WS">WS</option>
@@ -313,7 +345,7 @@ export default function InputPage() {
               </td>
 
               {/* 名前 */}
-              <td className="border">
+              <td className={borderClass}>
                 <input
                   value={p.name}
                   onChange={(e) => {
@@ -321,11 +353,12 @@ export default function InputPage() {
                     copy[i].name = e.target.value;
                     setPlayers(copy);
                   }}
+                  className="w-24 h-13 px-1 py-0.5 text-center "
                 />
               </td>
 
               {/* レセプション */}
-              <td className="border">
+              <td className={borderClass}>
                 <input
                   type="number"
                   value={p.stats.reception.A}
@@ -334,9 +367,10 @@ export default function InputPage() {
                     copy[i].stats.reception.A = +e.target.value;
                     setPlayers(copy);
                   }}
+                  className="w-13 h-13 px-1 py-0.5 text-center"
                 />
               </td>
-              <td className="border">
+              <td className={borderClass}>
                 <input
                   type="number"
                   value={p.stats.reception.BC}
@@ -345,9 +379,10 @@ export default function InputPage() {
                     copy[i].stats.reception.BC = +e.target.value;
                     setPlayers(copy);
                   }}
+                  className="w-13 h-13 px-1 py-0.5 text-center"
                 />
               </td>
-              <td className="border">
+              <td className={borderClass}>
                 <input
                   type="number"
                   value={p.stats.reception.miss}
@@ -356,12 +391,13 @@ export default function InputPage() {
                     copy[i].stats.reception.miss = +e.target.value;
                     setPlayers(copy);
                   }}
+                  className="w-13 h-13 px-1 py-0.5 text-center"
                 />
               </td>
-              <td className="border">{getReceptionPercentage(p)}%</td>
+              <td className={borderClass}>{getReceptionPercentage(p)}%</td>
 
               {/* サーブ */}
-              <td className="border ">
+              <td className={borderClass}>
                 <input
                   type="number"
                   value={p.stats.serve.count}
@@ -376,9 +412,10 @@ export default function InputPage() {
                         : Math.round((miss / newCount) * 1000) / 10;
                     setPlayers(copy);
                   }}
+                  className="w-13 h-13 px-1 py-0.5 text-center"
                 />
               </td>
-              <td className="border">
+              <td className={borderClass}>
                 <input
                   type="number"
                   value={p.stats.serve.point}
@@ -387,9 +424,10 @@ export default function InputPage() {
                     copy[i].stats.serve.point = +e.target.value;
                     setPlayers(copy);
                   }}
+                  className="w-13 h-13 px-1 py-0.5 text-center"
                 />
               </td>
-              <td className="border">
+              <td className={borderClass}>
                 <input
                   type="number"
                   value={p.stats.serve.miss}
@@ -404,13 +442,14 @@ export default function InputPage() {
                         : Math.round((newMiss / count) * 1000) / 10;
                     setPlayers(copy);
                   }}
+                  className="w-13 h-13 px-1 py-0.5 text-center"
                 />
               </td>
 
-              <td className="border">{p.stats.serve.missPercentage}%</td>
+              <td className={borderClass}>{p.stats.serve.missPercentage}%</td>
 
               {/* ブロック */}
-              <td className="border">
+              <td className={borderClass}>
                 <input
                   type="number"
                   value={p.stats.block.count}
@@ -419,9 +458,10 @@ export default function InputPage() {
                     copy[i].stats.block.count = +e.target.value;
                     setPlayers(copy);
                   }}
+                  className="w-13 h-13 px-1 py-0.5 text-center"
                 />
               </td>
-              <td className="border">
+              <td className={borderClass}>
                 <input
                   type="number"
                   value={p.stats.block.point}
@@ -430,11 +470,12 @@ export default function InputPage() {
                     copy[i].stats.block.point = +e.target.value;
                     setPlayers(copy);
                   }}
+                  className="w-13 h-13 px-1 py-0.5 text-center"
                 />
               </td>
 
               {/* スパイク */}
-              <td className="border">
+              <td className={borderClass}>
                 <input
                   type="number"
                   value={p.stats.spike.count}
@@ -449,10 +490,11 @@ export default function InputPage() {
                         : Math.round((point / newCount) * 1000) / 10;
                     setPlayers(copy);
                   }}
+                  className="w-13 h-13 px-1 py-0.5 text-center"
                 />
               </td>
 
-              <td className="border">
+              <td className={borderClass}>
                 <input
                   type="number"
                   value={p.stats.spike.point}
@@ -467,9 +509,10 @@ export default function InputPage() {
                         : Math.round((newPoint / count) * 1000) / 10;
                     setPlayers(copy);
                   }}
+                  className="w-13 h-13 px-1 py-0.5 text-center"
                 />
               </td>
-              <td className="border">
+              <td className={borderClass}>
                 <input
                   type="number"
                   value={p.stats.spike.miss}
@@ -478,13 +521,14 @@ export default function InputPage() {
                     copy[i].stats.spike.miss = +e.target.value;
                     setPlayers(copy);
                   }}
+                  className="w-13 h-13 px-1 py-0.5 text-center"
                 />
               </td>
-              <td className="border">{p.stats.spike.pointPercentage}%</td>
-              <td className="border">{getSpikePercentage(p)}%</td>
+              <td className={borderClass}>{p.stats.spike.pointPercentage}%</td>
+              <td className={borderClass}>{getSpikePercentage(p)}%</td>
 
               {/* その他 */}
-              <td className="border">
+              <td className={borderClass}>
                 <input
                   type="number"
                   value={p.stats.other.point}
@@ -493,9 +537,10 @@ export default function InputPage() {
                     copy[i].stats.other.point = +e.target.value;
                     setPlayers(copy);
                   }}
+                  className="w-13 h-13 px-1 py-0.5 text-center"
                 />
               </td>
-              <td className="border">
+              <td className={borderClass}>
                 <input
                   type="number"
                   value={p.stats.other.miss}
@@ -504,13 +549,14 @@ export default function InputPage() {
                     copy[i].stats.other.miss = +e.target.value;
                     setPlayers(copy);
                   }}
+                  className="w-13 h-13 px-1 py-0.5 text-center"
                 />
               </td>
 
               {/* TOTAL */}
-              <td className="border">{getPlus(p)}</td>
-              <td className="border">{getMinus(p)}</td>
-              <td className="border">{getNet(p)}</td>
+              <td className={borderClass}>{getPlus(p)}</td>
+              <td className={borderClass}>{getMinus(p)}</td>
+              <td className={borderClass}>{getNet(p)}</td>
             </tr>
           ))}
         </tbody>
@@ -518,9 +564,14 @@ export default function InputPage() {
       <br />
       <br />
       <br />
-      <button onClick={handleSave} className="border">
-        保存
-      </button>
+      <div className="flex justify-end mt-8 mb-8 pr-10">
+        <button
+          onClick={handleSave}
+          className="w-48 px-6 py-3 bg-purple-600 text-white font-semibold rounded-xl hover:bg-purple-700 transition-colors shadow-md"
+        >
+          保存
+        </button>
+      </div>
     </main>
   );
 }
