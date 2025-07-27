@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import axios from "axios";
 
 type ServeStat = {
   count: number;
@@ -73,8 +74,15 @@ const initialPlayers: PlayerRow[] = ["1", "2", "3", "4", "5", "6", "L"].map(
 
 export default function InputPage() {
   const [players, setPlayers] = useState<PlayerRow[]>(initialPlayers);
-  const [today,setToday] = useState("");
-  useEffect(()=>{
+  const [today, setToday] = useState("");
+  const [meta, setMeta] = useState({
+    tournamentType: "",
+    tournamentName: "",
+    venue: "",
+    opponent: "",
+    recorded_by: "",
+  });
+  useEffect(() => {
     const now = new Date();
     const formatted =
       now.getFullYear() +
@@ -83,7 +91,7 @@ export default function InputPage() {
       "/" +
       String(now.getDate()).padStart(2, "0");
     setToday(formatted);
-  },[])
+  }, []);
 
   const totalReception = players.reduce((recepSum, p) => {
     return (
@@ -103,14 +111,11 @@ export default function InputPage() {
   };
 
   const totalSpike = players.reduce((spikeSum, p) => {
-    return (
-      spikeSum + p.stats.spike.count
-    );
+    return spikeSum + p.stats.spike.count;
   }, 0);
 
   const getSpikePercentage = (p: PlayerRow): number => {
-    const individual =
-      p.stats.spike.count;
+    const individual = p.stats.spike.count;
     return totalSpike === 0
       ? 0
       : Math.round((individual / totalSpike) * 1000) / 10;
@@ -126,37 +131,122 @@ export default function InputPage() {
   };
 
   const getMinus = (p: PlayerRow): number => {
-    return (
-      p.stats.serve.miss +
-      p.stats.spike.miss +
-      p.stats.other.miss
-    );
+    return p.stats.serve.miss + p.stats.spike.miss + p.stats.other.miss;
   };
 
   const getNet = (p: PlayerRow): number => {
     return getPlus(p) - getMinus(p);
   };
-  
+
+  const handleSave = async () => {
+    const payload = {
+      date: today,
+      tournament: meta.tournamentType,
+      venue: meta.tournamentName,
+      opponent: meta.opponent,
+      recorded_by: meta.recorded_by,
+      players: players.map((p) => ({
+        name: p.name,
+        position: p.position,
+        stats: {
+          serve: {
+            count: p.stats.serve.count,
+            point: p.stats.serve.point,
+            miss: p.stats.serve.miss,
+            serveMissPercentage: p.stats.serve.missPercentage,
+          },
+          spike: {
+            count: p.stats.spike.count,
+            point: p.stats.spike.point,
+            miss: p.stats.spike.miss,
+            spikePointPercentage: p.stats.spike.pointPercentage,
+            spikePercentage: getSpikePercentage(p),
+          },
+          block: {
+            count: p.stats.block.count,
+            point: p.stats.block.point,
+          },
+          reception: {
+            A: p.stats.reception.A,
+            BC: p.stats.reception.BC,
+            miss: p.stats.reception.miss,
+            receptionPercentage: getReceptionPercentage(p),
+          },
+          other: {
+            point: p.stats.other.point,
+            miss: p.stats.other.miss,
+            total: p.stats.other.point + p.stats.other.miss,
+          },
+          TOTAL: {
+            plus: getPlus(p),
+            minus: getMinus(p),
+            net: getNet(p),
+          },
+        },
+      })),
+    };
+
+    try {
+      const res = await axios.post("/api/match", payload);
+      console.log("成功:", res.data);
+      alert("保存に成功しました");
+    } catch (err) {
+      console.error("送信失敗:", err);
+      alert("保存に失敗しました");
+    }
+  };
+
   return (
     <main className="text-black">
       <h3>Date: {today}</h3>
+
       <label>大会の種類：</label>
-      <select id="tournament-type" name="tournamentType">
+      <select
+        id="tournament-type"
+        name="tournamentType"
+        value={meta.tournamentType}
+        onChange={(e) => setMeta({ ...meta, tournamentType: e.target.value })}
+      >
         <option value="">-</option>
         <option value="official">公式</option>
         <option value="practice">練習</option>
       </select>
+
       <label>大会名:</label>
-      <input type="text" id="tournament-name" name="tournamentName" />
+      <input
+        type="text"
+        id="tournament-name"
+        name="tournamentName"
+        value={meta.tournamentName}
+        onChange={(e) => setMeta({ ...meta, tournamentName: e.target.value })}
+      />
 
       <label>会場名:</label>
-      <input type="text" id="venue" name="venue" />
+      <input
+        type="text"
+        id="venue"
+        name="venue"
+        value={meta.venue}
+        onChange={(e) => setMeta({ ...meta, venue: e.target.value })}
+      />
 
       <label>対戦相手:</label>
-      <input type="text" id="opponent" name="opponent" />
+      <input
+        type="text"
+        id="opponent"
+        name="opponent"
+        value={meta.opponent}
+        onChange={(e) => setMeta({ ...meta, opponent: e.target.value })}
+      />
 
       <label>記入者:</label>
-      <input type="text" id="recorded_by" name="recorded_by" />
+      <input
+        type="text"
+        id="recorded_by"
+        name="recorded_by"
+        value={meta.recorded_by}
+        onChange={(e) => setMeta({ ...meta, recorded_by: e.target.value })}
+      />
       <br />
       <br />
       <br />
@@ -281,7 +371,9 @@ export default function InputPage() {
                     const miss = copy[i].stats.serve.miss;
                     copy[i].stats.serve.count = newCount;
                     copy[i].stats.serve.missPercentage =
-                      newCount === 0 ? 0 : Math.round((miss / newCount) * 1000) / 10;
+                      newCount === 0
+                        ? 0
+                        : Math.round((miss / newCount) * 1000) / 10;
                     setPlayers(copy);
                   }}
                 />
@@ -307,7 +399,9 @@ export default function InputPage() {
                     const count = copy[i].stats.serve.count;
                     copy[i].stats.serve.miss = newMiss;
                     copy[i].stats.serve.missPercentage =
-                      count === 0 ? 0 : Math.round((newMiss / count) * 1000) / 10;
+                      count === 0
+                        ? 0
+                        : Math.round((newMiss / count) * 1000) / 10;
                     setPlayers(copy);
                   }}
                 />
@@ -322,7 +416,7 @@ export default function InputPage() {
                   value={p.stats.block.count}
                   onChange={(e) => {
                     const copy = [...players];
-                    copy[i].stats.block.point = +e.target.value;
+                    copy[i].stats.block.count = +e.target.value;
                     setPlayers(copy);
                   }}
                 />
@@ -350,7 +444,9 @@ export default function InputPage() {
                     const point = copy[i].stats.spike.point;
                     copy[i].stats.spike.count = newCount;
                     copy[i].stats.spike.pointPercentage =
-                      newCount === 0 ? 0 : Math.round((point / newCount) * 1000) / 10;
+                      newCount === 0
+                        ? 0
+                        : Math.round((point / newCount) * 1000) / 10;
                     setPlayers(copy);
                   }}
                 />
@@ -366,11 +462,12 @@ export default function InputPage() {
                     const count = copy[i].stats.spike.count;
                     copy[i].stats.spike.point = newPoint;
                     copy[i].stats.spike.pointPercentage =
-                      count === 0 ? 0 : Math.round((newPoint / count) * 1000) / 10;
+                      count === 0
+                        ? 0
+                        : Math.round((newPoint / count) * 1000) / 10;
                     setPlayers(copy);
                   }}
                 />
-
               </td>
               <td className="border">
                 <input
@@ -421,7 +518,9 @@ export default function InputPage() {
       <br />
       <br />
       <br />
-      <button className="border">保存</button>
+      <button onClick={handleSave} className="border">
+        保存
+      </button>
     </main>
   );
 }
