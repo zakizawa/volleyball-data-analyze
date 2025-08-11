@@ -1,81 +1,21 @@
 "use client";
 import { useEffect, useState } from "react";
+import { PlayerRow, MatchMeta, createDefaultStats } from "@/types/match";
 import axios from "axios";
 
-type ServeStat = {
-  count: number;
-  point: number;
-  miss: number;
-  missPercentage: number;
-};
-
-type SpikeStat = {
-  count: number;
-  point: number;
-  miss: number;
-  pointPercentage: number;
-  zentaiPercentage: number;
-};
-
-type BlockStat = {
-  count: number;
-  point: number;
-};
-
-type ReceptionStat = {
-  A: number;
-  BC: number;
-  miss: number;
-  zentaiPercentage: number;
-};
-
-type OtherStat = {
-  point: number;
-  miss: number;
-  total: number;
-};
-
-type PlayerRow = {
-  order: string;
-  name: string;
-  position: string;
-  //   entry_year: number;
-  stats: {
-    serve: ServeStat;
-    spike: SpikeStat;
-    block: BlockStat;
-    reception: ReceptionStat;
-    other: OtherStat;
-  };
-};
-
-const defaultStats = {
-  serve: { count: 0, point: 0, miss: 0, missPercentage: 0 },
-  spike: {
-    count: 0,
-    point: 0,
-    miss: 0,
-    pointPercentage: 0,
-    zentaiPercentage: 0,
-  },
-  block: { count: 0, point: 0 },
-  reception: { A: 0, BC: 0, miss: 0, zentaiPercentage: 0 },
-  other: { point: 0, miss: 0, total: 0 },
-};
-
-const initialPlayers: PlayerRow[] = ["1", "2", "3", "4", "5", "6", "L"].map(
-  (order) => ({
+const initialPlayers: PlayerRow[] =
+  (['1', '2', '3', '4', '5', '6', 'L'] as const).map(order => ({
     order,
-    name: "",
-    position: "",
-    stats: JSON.parse(JSON.stringify(defaultStats)),
-  })
-);
+    name: '',
+    position: '',
+    stats: createDefaultStats()
+  }));
 
 export default function InputPage() {
   const [players, setPlayers] = useState<PlayerRow[]>(initialPlayers);
   const [today, setToday] = useState("");
-  const [meta, setMeta] = useState({
+  const [meta, setMeta] = useState<MatchMeta>({
+    date: "",
     tournamentType: "",
     tournamentName: "",
     venue: "",
@@ -207,11 +147,11 @@ export default function InputPage() {
         id="tournament-type"
         name="tournamentType"
         value={meta.tournamentType}
-        onChange={(e) => setMeta({ ...meta, tournamentType: e.target.value })}
+        onChange={(e) => setMeta({ ...meta, tournamentType: e.target.value as MatchMeta["tournamentType"] })}
       >
         <option value="">-</option>
-        <option value="official">公式</option>
-        <option value="practice">練習</option>
+        <option value="official">official</option>
+        <option value="practice">practice</option>
       </select>
 
       <label>大会名:</label>
@@ -329,7 +269,7 @@ export default function InputPage() {
                   value={p.position}
                   onChange={(e) => {
                     const copy = [...players];
-                    copy[i].position = e.target.value;
+                    copy[i].position = e.target.value as PlayerRow['position'];
                     setPlayers(copy);
                   }}
                   className="w-13 h-13 px-1 py-0.5 text-center"
