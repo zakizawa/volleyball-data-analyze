@@ -59,6 +59,30 @@ const rallyState = (state, eventState) => {
 
 console.log(rallyState(exRallyState, exRallyEvent))
 
+/* 選手交代の処理 */
+const exExchangeEvent = {
+    out: "sato",
+    in: "tsunoda",
+};
+const exExchangeState = {
+    setNo: 3,
+    score: { us: 11, them: 7 },
+    weServed: true,
+    rotation: { 1: 'sato', 2: 'ito', 3: 'kato', 4: 'sasaki', 5: 'tanaka', 6: 'saitou' },
+    libero: "kudou"
+};
+
+const playerExchangeState = (state, eventState) => {
+    const next = { ...state.rotation };
+    Object.keys(next).forEach((position) => {
+        if (next[position] === eventState.out) next[position] = eventState.in;
+    });
+    state.rotation = next;
+    return state
+};
+
+console.log(playerExchangeState(exExchangeState, exExchangeEvent))
+
 // プロトタイプ
 // type ServeStat = {
 //   count: number;
