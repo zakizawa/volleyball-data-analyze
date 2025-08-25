@@ -3,7 +3,37 @@ type Team = "us" | "them"
 type RoutarionPos = 1 | 2 | 3 | 4 | 5 | 6;
 type PlayerId = string;
 
-// rは選手情報(ローテーションと選手ID)
+/* ローテーション初期状態 */
+const firstState = {
+    setNo: 1,
+    rotation: { 1: 'sato', 2: 'ito', 3: 'kato', 4: 'sasaki', 5: 'tanaka', 6: 'saitou' },
+    libero: "kudou",
+    firstServe: "us"
+}
+const startState = (state) => {
+    return ({
+        setNo: state.setNo,
+        score: { us: 0, them: 0 },
+        weServed: state.firstServe === "us",
+        rotation: { ...state.rotation },
+        libero: state.libero
+    })
+};
+
+console.log(startState(firstState))
+
+/* ラリーの処理 */
+const exRallyEvent = {
+    setNo: 1,
+    rallyWon: false
+};
+const exRallyState = {
+    setNo: 1,
+    score: { us: 7, them: 4 },
+    weServed: true,
+    rotation: { 1: 'sato', 2: 'ito', 3: 'kato', 4: 'sasaki', 5: 'tanaka', 6: 'saitou' },
+    libero: "kudou"
+}
 const rotate = (r: Record<RoutarionPos, PlayerId>): Record<RoutarionPos, PlayerId> => (
     {
         1: r[6],
@@ -14,6 +44,20 @@ const rotate = (r: Record<RoutarionPos, PlayerId>): Record<RoutarionPos, PlayerI
         6: r[5],
     }
 );
+const rallyState = (state, eventState) => {
+    // スコアのカウントアップ
+    eventState.rallyWon ? state.score.us++ : state.score.them++;
+    // サーブ権の交代
+    state.weServed = eventState.rallyWon;
+    // 回転の具体的なロジック
+    const rotateUs = !state.weServed && eventState.rallyWon;
+    if (rotateUs) state.rotation = rotate(state.rotation);
+
+
+    return state
+};
+
+console.log(rallyState(exRallyState, exRallyEvent))
 
 // プロトタイプ
 // type ServeStat = {
