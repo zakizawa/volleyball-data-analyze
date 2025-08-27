@@ -1,8 +1,4 @@
 'use client';
-/** Type宣言 **/
-/* ローテーションの動作と、選手の交代 */
-const matchSetReducer = () => { };
-
 
 
 
