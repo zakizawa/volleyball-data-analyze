@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { Edit, Database, BarChart2, User } from "lucide-react";
-import Link from "next/link";
+import { Edit, Database, BarChart2, User } from 'lucide-react';
+import Link from 'next/link';
 
 const items = [
-  { href: "/input", icon: <Edit size={60} />, label: "データ入力" },
-  { href: "/matches", icon: <Database size={60} />, label: "試合データ" },
-  { href: "/analysis", icon: <BarChart2 size={60} />, label: "分析データ" },
-  { href: "/mypage", icon: <User size={60} />, label: "選手ページ" },
+  { href: '/input', icon: <Edit size={60} />, label: 'データ入力' },
+  { href: '/matches', icon: <Database size={60} />, label: '試合データ' },
+  { href: '/analysis', icon: <BarChart2 size={60} />, label: '分析データ' },
+  { href: '/players', icon: <User size={60} />, label: '選手ページ' }
 ];
 
 export default function Home() {
